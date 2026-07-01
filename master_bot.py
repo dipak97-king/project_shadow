@@ -1,12 +1,9 @@
-
 import asyncio
 import os
-import sqlite3
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait
+from pyrogram.storage import StringSession # Yeh import add karein
+from database import save_session, get_session, add_worker, get_all_workers
 
-from database import init_db, add_worker, get_all_workers, remove_worker, DATA_DIR
 
 # --- Configuration (Using Environment Variables for Railway) --- #
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
@@ -29,17 +26,13 @@ master_bot = Client(
     workdir=DATA_DIR # Store master session in data dir
 )
 
-# --- Worker Account Client Factory --- #
 async def get_worker_client(phone_number):
-    session_path = os.path.join(DATA_DIR, "sessions")
-    os.makedirs(session_path, exist_ok=True)
-    # The session name should be the full path or relative to workdir
+    session_str = get_session(phone_number) # Firebase se string fetch karega
     return Client(
         f"{phone_number}", 
-        API_ID, 
-        API_HASH, 
-        phone_number=phone_number,
-        workdir=session_path
+        api_id=API_ID, 
+        api_hash=API_HASH, 
+        session_string=session_str or "" # String session yahan use hoga
     )
 
 # --- Helper Functions --- #
@@ -66,7 +59,11 @@ async def complete_login(client, phone_number, phone_code_hash, phone_code, mess
     try:
         await client.sign_in(phone_number, phone_code_hash, phone_code)
         # Store just the phone number, we know where the sessions are
-        add_worker(phone_number, phone_number)
+                # --- YE NAYA PART HAI ---
+        session_string = await client.export_session_string() # Session export karein
+        save_session(phone_number, session_string)             # Firebase mein save karein
+        add_worker(phone_number)                               # Worker list mein add karein
+        # ----------------------
         await message.reply_text(f"Successfully logged in {phone_number} and added to workers.")
         return True
     except PhoneCodeInvalid:
