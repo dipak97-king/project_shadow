@@ -10,7 +10,8 @@ except RuntimeError:
 
 # --- 2. AB PYROGRAM IMPORT KAREIN ---
 from pyrogram import Client, filters
-from pyrogram.storage.session import StringSession
+# StringSession ko direct pyrogram package se import karein
+from pyrogram import StringSession
 from database import init_db, save_session, get_session, add_worker, get_all_workers
 
 # --- 3. CONFIGURATION ---
