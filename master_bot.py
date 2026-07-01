@@ -10,7 +10,7 @@ from database import init_db, add_worker, get_all_workers, remove_worker
 
 # --- Configuration --- #
 # Master Bot API Token (from BotFather)
-MASTER_BOT_TOKEN = "YOUR_MASTER_BOT_TOKEN"  # <<< IMPORTANT: Replace with your Master Bot's token
+MASTER_BOT_TOKEN = "8927642493:AAHbRfihDlpDIpa1OPPLstTIalp4sKsyIBU"  # <<< IMPORTANT: Replace with your Master Bot's token
 
 # Telegram API ID and HASH for worker accounts (from my.telegram.org)
 API_ID = 1234567  # <<< IMPORTANT: Replace with your API ID
