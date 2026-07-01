@@ -1,5 +1,8 @@
 import asyncio
 import os
+from pyrogram import Client, filters
+from pyrogram.storage.session import StringSession
+from database import init_db, save_session, get_session, add_worker, get_all_workers
 
 # --- EVENT LOOP FIX ---
 try:
@@ -7,11 +10,6 @@ try:
 except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-
-from pyrogram import Client, filters
-# StringSession ko direct pyrogram se try karte hain (v2.0+)
-from pyrogram import StringSession 
-from database import init_db, save_session, get_session, add_worker, get_all_workers
 
 # --- Configuration ---
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
