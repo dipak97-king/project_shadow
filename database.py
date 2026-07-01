@@ -1,51 +1,31 @@
-
-import sqlite3
+import firebase_admin
+from firebase_admin import credentials, firestore
 import os
+import json
 
-# Data directory for persistence (especially for Railway Volumes)
-DATA_DIR = os.getenv("DATA_DIR", "data")
-DB_PATH = os.path.join(DATA_DIR, "bot_database.db")
+# Firebase initialize
+if os.getenv("FIREBASE_CREDENTIALS"):
+    cred_dict = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+    cred = credentials.Certificate(cred_dict)
+else:
+    # Local testing ke liye
+    cred = credentials.Certificate("firebase-key.json")
 
-def init_db():
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-        
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # Table for worker accounts
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS worker_accounts (
-        phone_number TEXT PRIMARY KEY,
-        session_name TEXT NOT NULL,
-        status TEXT DEFAULT 'active'
-    )
-    """)
-    
-    conn.commit()
-    conn.close()
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 def add_worker(phone_number, session_name):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("INSERT OR REPLACE INTO worker_accounts (phone_number, session_name) VALUES (?, ?)", (phone_number, session_name))
-    conn.commit()
-    conn.close()
+    # Firestore mein data save
+    db.collection("workers").document(phone_number).set({
+        "phone_number": phone_number,
+        "session_name": session_name,
+        "status": "active"
+    })
 
 def get_all_workers():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT phone_number, session_name FROM worker_accounts")
-    workers = cursor.fetchall()
-    conn.close()
-    return workers
+    # Firestore se data fetch
+    docs = db.collection("workers").stream()
+    return [(doc.id, doc.to_dict()['session_name']) for doc in docs]
 
 def remove_worker(phone_number):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM worker_accounts WHERE phone_number = ?", (phone_number,))
-    conn.commit()
-    conn.close()
-
-if __name__ == "__main__":
-    init_db()
+    db.collection("workers").document(phone_number).delete()
