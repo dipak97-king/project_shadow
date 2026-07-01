@@ -1,17 +1,19 @@
 import asyncio
 import os
-from pyrogram import Client, filters
-from pyrogram.storage.session import StringSession
-from database import init_db, save_session, get_session, add_worker, get_all_workers
 
-# --- EVENT LOOP FIX ---
+# --- 1. SABSE PEHLE LOOP FIX KAREIN ---
 try:
     loop = asyncio.get_event_loop()
 except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-# --- Configuration ---
+# --- 2. AB PYROGRAM IMPORT KAREIN ---
+from pyrogram import Client, filters
+from pyrogram.storage.session import StringSession
+from database import init_db, save_session, get_session, add_worker, get_all_workers
+
+# --- 3. CONFIGURATION ---
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
 API_ID = int(os.getenv("API_ID", 0))
 API_HASH = os.getenv("API_HASH")
@@ -20,10 +22,9 @@ if not MASTER_BOT_TOKEN or not API_ID or not API_HASH:
     print("ERROR: MASTER_BOT_TOKEN, API_ID, and API_HASH must be set!")
     exit(1)
 
-# --- Initialize Database ---
-init_db() 
+# --- 4. DATABASE & BOT INITIALIZATION ---
+init_db()
 
-# --- Master Bot Client ---
 master_bot = Client(
     "master_bot_session",
     api_id=API_ID,
@@ -39,8 +40,6 @@ async def get_worker_client(phone_number):
         api_hash=API_HASH, 
         session_string=session_str if session_str else "" 
     )
-
-
 
 # --- Helper Functions --- #
 async def send_login_request(client, phone_number, message):
