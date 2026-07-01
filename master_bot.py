@@ -1,13 +1,17 @@
 import asyncio
 import os
-from pyrogram import Client, filters
-from pyrogram.storage import StringSession # Yeh import add karein
-from database import save_session, get_session, add_worker, get_all_workers
+
+# --- EVENT LOOP FIX (Yeh sabse upar hona chahiye) ---
 try:
     loop = asyncio.get_event_loop()
 except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+# ----------------------------------------------------
+
+from pyrogram import Client, filters
+from pyrogram.storage import StringSession
+from database import save_session, get_session, add_worker, get_all_workers
 
 # --- Configuration (Using Environment Variables for Railway) --- #
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
