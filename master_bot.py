@@ -1,16 +1,14 @@
 import asyncio
 import os
 
-# --- 1. SABSE PEHLE LOOP FIX KAREIN ---
+# Loop fix
 try:
     loop = asyncio.get_event_loop()
 except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-# --- 2. AB PYROGRAM IMPORT KAREIN ---
 from pyrogram import Client, filters
-# StringSession ko direct pyrogram package se import karein
 from database import init_db, save_session, get_session, add_worker, get_all_workers
 
 # --- 3. CONFIGURATION ---
