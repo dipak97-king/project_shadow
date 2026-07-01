@@ -10,7 +10,7 @@ except RuntimeError:
 # ----------------------------------------------------
 
 from pyrogram import Client, filters
-from pyrogram.storage import StringSession
+from pyrogram import Client, filters, StringSession
 from database import save_session, get_session, add_worker, get_all_workers
 
 # --- Configuration (Using Environment Variables for Railway) --- #
