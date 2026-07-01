@@ -9,8 +9,8 @@ except RuntimeError:
     asyncio.set_event_loop(loop)
 
 from pyrogram import Client, filters
-from pyrogram.storage import StringSession
-# Import ALL database functions from database.py
+# StringSession ko direct pyrogram se try karte hain (v2.0+)
+from pyrogram import StringSession 
 from database import init_db, save_session, get_session, add_worker, get_all_workers
 
 # --- Configuration ---
