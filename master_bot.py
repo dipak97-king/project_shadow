@@ -8,9 +8,8 @@ except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-from pyrogram import Client, filters, StringSession
-# Import added: init_db, DATA_DIR
-from database import init_db, DATA_DIR, save_session, get_session, add_worker, get_all_workers
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # --- Configuration ---
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
@@ -32,13 +31,17 @@ master_bot = Client(
     bot_token=MASTER_BOT_TOKEN
 )
 
+# StringSession ko direct use karein (Pyrogram 2.0+ format)
+from pyrogram import Client
+from pyrogram.storage import StringSession
+
 async def get_worker_client(phone_number):
-    session_str = get_session(phone_number) 
+    session_str = get_session(phone_number)
     return Client(
         f"{phone_number}", 
         api_id=API_ID, 
         api_hash=API_HASH, 
-        session_string=session_str or "" 
+        session_string=session_str if session_str else "" 
     )
 
 
