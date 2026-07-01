@@ -1,47 +1,46 @@
 import asyncio
 import os
 
-# --- EVENT LOOP FIX (Yeh sabse upar hona chahiye) ---
+# --- EVENT LOOP FIX ---
 try:
     loop = asyncio.get_event_loop()
 except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-# ----------------------------------------------------
 
-from pyrogram import Client, filters
 from pyrogram import Client, filters, StringSession
-from database import save_session, get_session, add_worker, get_all_workers
+# Import added: init_db, DATA_DIR
+from database import init_db, DATA_DIR, save_session, get_session, add_worker, get_all_workers
 
-# --- Configuration (Using Environment Variables for Railway) --- #
+# --- Configuration ---
 MASTER_BOT_TOKEN = os.getenv("MASTER_BOT_TOKEN")
 API_ID = int(os.getenv("API_ID", 0))
 API_HASH = os.getenv("API_HASH")
 
 if not MASTER_BOT_TOKEN or not API_ID or not API_HASH:
-    print("ERROR: MASTER_BOT_TOKEN, API_ID, and API_HASH must be set in Environment Variables!")
+    print("ERROR: MASTER_BOT_TOKEN, API_ID, and API_HASH must be set!")
     exit(1)
 
-# --- Initialize Database --- #
+# --- Initialize Database ---
 init_db()
 
-# --- Master Bot Client --- #
+# --- Master Bot Client ---
 master_bot = Client(
     "master_bot_session",
     api_id=API_ID,
     api_hash=API_HASH,
-    bot_token=MASTER_BOT_TOKEN,
-    workdir=DATA_DIR # Store master session in data dir
+    bot_token=MASTER_BOT_TOKEN
 )
 
 async def get_worker_client(phone_number):
-    session_str = get_session(phone_number) # Firebase se string fetch karega
+    session_str = get_session(phone_number) 
     return Client(
         f"{phone_number}", 
         api_id=API_ID, 
         api_hash=API_HASH, 
-        session_string=session_str or "" # String session yahan use hoga
+        session_string=session_str or "" 
     )
+
 
 # --- Helper Functions --- #
 async def send_login_request(client, phone_number, message):
